@@ -19,6 +19,7 @@ get '/' do
     </style>
   </head>
   <body>
+    <center>
     <h1>Find a Movie!</h1>
     <form accept-charset="UTF-8" action="/result" method="post">
     <label for="movie">Search for:</label>
@@ -28,13 +29,24 @@ get '/' do
     <form action="/hi" method="post">
     <input name="say hi" type="submit" value="Say Hi" />
     </form>
+    </center>
   </body>
   </html>
   )
 end
 
 post '/hi' do
-  html_str = "<html><head><title>Hi there</title><body><h1>Hello there</h1><h3>This is a test page</h3></body></html>"
+  html_str = "
+  <html>
+  <head>
+    <title>Hi there</title>
+  <body>
+  <center>
+    <h1>Hello there</h1>
+    <h3>This is a test page</h3>
+  </center>
+  </body>
+  </html>"
 end
 
 post '/result' do
@@ -46,13 +58,28 @@ post '/result' do
   sorted_response = response['Search'].sort_by {|movie| movie['Year']}
 
   # Modify the html output so that a list of movies is provided.
-  html_str = "<html><head><title>Movie Search Results</title></head><body><h1>Movie Results</h1>\n<ul>"
+  html_str = "
+  <html>
+  <head>
+    <title>Movie Search Results</title>
+  </head>
+  <body style='background-color: #ededed'>
+    <center>
+    <h1 style='font-family:Courier'>Movie Results</h1>\n
+    <ul>"
 
   sorted_response.each do |movie|
-    html_str += "<li><a href=/poster/#{movie['imdbID']}>#{movie['Title']} - #{movie['Year']}</a></li>"
+    html_str += "
+      <li>
+        <a href=/poster/#{movie['imdbID']}>#{movie['Title']} - #{movie['Year']}</a>
+      </li>"
   end
 
-  html_str += "</ul></body></html>"
+  html_str += "
+    </ul>
+  </center>
+  </body>
+  </html>"
 
 end
 #imdbID
@@ -61,9 +88,22 @@ get '/poster/:imdb' do
   search_str = params[:imdb].to_s
   result = Typhoeus.get("www.omdbapi.com/?i=#{search_str}")
   parser = JSON.parse(result.body)
-  html_str = "<html><head><title>Movie Poster</title></head><body><h1>Movie Poster</h1>\n"
-  html_str += "<h3>#{parser['Title']}</h3>"
-  html_str += "<img src=#{parser['Poster']} />"
-  html_str += '<br /><a href="/">New Search</a></body></html>'
+  html_str = "
+  <html>
+  <head>
+    <title>Movie Poster</title>
+  </head>
+  <body style='background-color: #ededed'>
+    <center>
+    <h1 style='font-family:Courier'>Movie Poster</h1>\n"
+  html_str += "
+    <h3>#{parser['Title']}</h3>"
+  html_str += "
+    <img src=#{parser['Poster']} />"
+  html_str += '
+    <br /><a href="/">New Search</a>
+  /center>
+  </body>
+  </html>'
 
 end
